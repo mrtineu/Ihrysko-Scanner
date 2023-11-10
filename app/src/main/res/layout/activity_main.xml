@@ -40,10 +40,20 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"/>
 
+    <TextView
+        android:id="@+id/eanTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="EAN:"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
     <ImageView
         android:id="@+id/itemImageView"
         android:layout_width="match_parent"
-        android:layout_height="471dp"
+        android:layout_height="433dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:src="@drawable/ic_launcher_foreground" />
@@ -53,12 +63,12 @@
         android:layout_width="386dp"
         android:layout_height="29dp" />
 
-    <ImageButton
+    <Button
         android:id="@+id/imageButton"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/common_google_signin_btn_icon_dark_normal" />
+        android:background="@drawable/custom_button_background"/>
 
 </LinearLayout>

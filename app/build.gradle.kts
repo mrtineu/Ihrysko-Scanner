@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    implementation ("com.squareup.picasso:picasso:2.71828")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.1")
     implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
     implementation("androidx.core:core-ktx:1.9.0")
