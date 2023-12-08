@@ -49,11 +49,29 @@
         android:text="EAN:"
         android:textSize="18sp"
         android:textStyle="bold" />
+    <TextView
+        android:id="@+id/VivoLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Vivo Sklady:"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/VivoLocationShop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Vivo Shop:"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/itemImageView"
         android:layout_width="match_parent"
-        android:layout_height="433dp"
+        android:layout_height="359dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:src="@drawable/ic_launcher_foreground" />
