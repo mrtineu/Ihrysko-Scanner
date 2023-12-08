@@ -37,6 +37,8 @@ class MainActivity : Activity(), CoroutineScope {
     private lateinit var itemImageView: ImageView
     private lateinit var syncView: TextView
     private lateinit var eanView: TextView
+    private lateinit var locView: TextView
+    private lateinit var locshopView: TextView
     private val search = Search()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +55,8 @@ class MainActivity : Activity(), CoroutineScope {
         itemImageView = findViewById(R.id.itemImageView)
         syncView = findViewById(R.id.syncview)
         eanView = findViewById(R.id.eanTextView)
+        locView = findViewById(R.id.VivoLocation)
+        locshopView = findViewById(R.id.VivoLocationShop)
 
         Log.d("INFO", "Initialized views")
 
@@ -115,6 +119,8 @@ class MainActivity : Activity(), CoroutineScope {
             priceTextView.text = "Price: ${details.price}"
             idTextView.text = "ID: ${details.id}"
             eanView.text = "EAN: ${barcode.rawValue.toString()}"
+            locView.text = "Sklady: ${details.location}"
+            locshopView.text = "Shop: ${details.location_shop}"
 
             launch {
                 try {
@@ -129,6 +135,10 @@ class MainActivity : Activity(), CoroutineScope {
         } else {
             nameTextView.text = "Name: Barcode not found"
             eanView.text = "EAN: ${barcode.rawValue.toString()}"
+            locView.text = ""
+            locshopView.text = ""
+            idTextView.text = ""
+            priceTextView.text = ""
             Log.d("WARNING", "Barcode not found")
             changeTextButton.visibility = View.VISIBLE
         }
