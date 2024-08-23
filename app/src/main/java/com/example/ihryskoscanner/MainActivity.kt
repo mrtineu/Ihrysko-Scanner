@@ -39,7 +39,8 @@ class MainActivity : Activity(), CoroutineScope {
     private lateinit var eanView: TextView
     private lateinit var locView: TextView
     private lateinit var locshopView: TextView
-    private val search = Search()
+    private lateinit var stockView: TextView
+    private val search = Get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +58,7 @@ class MainActivity : Activity(), CoroutineScope {
         eanView = findViewById(R.id.eanTextView)
         locView = findViewById(R.id.VivoLocation)
         locshopView = findViewById(R.id.VivoLocationShop)
+        stockView = findViewById(R.id.VivoStock)
 
         Log.d("INFO", "Initialized views")
 
@@ -75,10 +77,9 @@ class MainActivity : Activity(), CoroutineScope {
                 launch {
                     val barcodeValue = barcode.rawValue.toString()
                     Log.d("INFO", "Barcode scanned $barcodeValue")
-                    val xmlContent = search.fetchXMLContent()
 
                     withContext(Dispatchers.Main) {
-                        processXMLContent(xmlContent, barcode)
+                        processXMLContent(barcode)
                     }
                 }
             }
@@ -88,7 +89,7 @@ class MainActivity : Activity(), CoroutineScope {
             }
     }
 
-    private suspend fun loadImageFromNetwork(imageUrl: String, imageView: ImageView) {
+    private suspend fun loadImageFromNetwork(imageUrl: String?, imageView: ImageView) {
         withContext(Dispatchers.Main) {
 
 
@@ -107,41 +108,63 @@ class MainActivity : Activity(), CoroutineScope {
         }
     }
 
-    private suspend fun processXMLContent(xmlContent: String, barcode: Barcode) {
+    private suspend fun processXMLContent(barcode: Barcode) {
         val start = System.currentTimeMillis()
         Log.d("INFO", "XML search started ")
 
         syncView.text = "Started search"
-        val details = search.searchAndRetrieveDetails(barcode.rawValue.toString(), xmlContent)
 
-        if (details != null) {
-            nameTextView.text = "Name: ${details.name}"
-            priceTextView.text = "Price: ${details.price}"
-            idTextView.text = "ID: ${details.id}"
-            eanView.text = "EAN: ${barcode.rawValue.toString()}"
-            locView.text = "Sklady: ${details.location}"
-            locshopView.text = "Shop: ${details.location_shop}"
-
-            launch {
-                try {
-                    val imageUrl = details.image
-                    loadImageFromNetwork(imageUrl, itemImageView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+        try {
+            val details = withContext(Dispatchers.IO) {
+                search.ean(barcode.rawValue.toString())
             }
 
-            changeTextButton.visibility = View.VISIBLE
-        } else {
-            nameTextView.text = "Name: Barcode not found"
-            eanView.text = "EAN: ${barcode.rawValue.toString()}"
-            locView.text = ""
-            locshopView.text = ""
-            idTextView.text = ""
-            priceTextView.text = ""
-            Log.d("WARNING", "Barcode not found")
-            changeTextButton.visibility = View.VISIBLE
+            details?.let { list ->
+                if (list.isNotEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        val detail = list.first()
+                        nameTextView.text = "Name: ${detail.name}"
+                        priceTextView.text = "Price: ${detail.price}"
+                        idTextView.text = "ID: ${detail.item_id}"
+                        eanView.text = "EAN: ${barcode.rawValue.toString()}"
+                        locView.text = "Sklady: ${detail.location}"
+                        locshopView.text = "Shop: ${detail.location_shop}"
+                        stockView.text = "Stock: ${detail.stock}"
+
+                        launch {
+                            try {
+                                val imageUrl = detail.image
+                                loadImageFromNetwork(imageUrl, itemImageView)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+
+                        changeTextButton.visibility = View.VISIBLE
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        nameTextView.text = "Name: Barcode not found"
+                        eanView.text = "EAN: ${barcode.rawValue.toString()}"
+                        locView.text = ""
+                        locshopView.text = ""
+                        idTextView.text = ""
+                        priceTextView.text = ""
+                        stockView.text = ""
+                        Log.d("WARNING", "Barcode not found")
+                        changeTextButton.visibility = View.VISIBLE
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                // Handle exception
+                e.printStackTrace()
+                Log.e("ERROR", "Error fetching details: ${e.message}")
+                syncView.text = "Error: ${e.message}"
+            }
         }
+
         val time = System.currentTimeMillis() - start
         syncView.text = "Finished in $time ms"
         Log.d("INFO", "Rendering finished in $time")
