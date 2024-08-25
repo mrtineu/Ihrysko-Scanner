@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    implementation ("com.google.android.material:material:1.3.0-alpha03")
     implementation ("com.squareup.picasso:picasso:2.71828")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.1")
     implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
@@ -73,5 +74,6 @@ dependencies {
     implementation("org.jsoup:jsoup:1.14.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation ("androidx.appcompat:appcompat:1.6.1")
 
 }
