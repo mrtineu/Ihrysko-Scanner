@@ -13,7 +13,7 @@ class Get {
 
     companion object {
         // Making authToken a public static variable in the companion object
-        var authToken: String? = null
+        var authToken: String? = null   
     }
     fun ean(barcode: String): List<Details>? {
         val url = URL("http://192.168.100.21:8000/search/barcode/$barcode")

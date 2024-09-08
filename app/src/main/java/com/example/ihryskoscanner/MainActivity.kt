@@ -41,7 +41,6 @@ class MainActivity : Activity(), CoroutineScope {
     private lateinit var priceTextView: TextView
     private lateinit var idTextView: TextView
     private lateinit var itemImageView: ImageView
-    private lateinit var syncView: TextView
     private lateinit var eanView: TextView
     private lateinit var locView: TextView
     private lateinit var locshopView: TextView
@@ -221,7 +220,6 @@ class MainActivity : Activity(), CoroutineScope {
             val start = System.currentTimeMillis()
             Log.d("INFO", "XML search started ")
 
-            syncView.text = "Started search"
 
             try {
                 val details = withContext(Dispatchers.IO) {
@@ -270,12 +268,10 @@ class MainActivity : Activity(), CoroutineScope {
                     // Handle exception
                     e.printStackTrace()
                     Log.e("ERROR", "Error fetching details: ${e.message}")
-                    syncView.text = "Error: ${e.message}"
                 }
             }
 
             val time = System.currentTimeMillis() - start
-            syncView.text = "Finished in $time ms"
             Log.d("INFO", "Rendering finished in $time")
         }
 
