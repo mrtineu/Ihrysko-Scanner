@@ -16,7 +16,7 @@ class Get {
         var authToken: String? = null   
     }
     fun ean(barcode: String): List<Details>? {
-        val url = URL("http://192.168.100.21:8000/search/barcode/$barcode")
+        val url = URL("https://eshop-w10.tail90e65e.ts.net/search/barcode/$barcode")
 
 
         with(url.openConnection() as HttpURLConnection) {
@@ -41,7 +41,7 @@ class Get {
         }
     }
     fun name(namee: String): List<Details>? {
-        val url = URL("http://192.168.100.21:8000/search/name/$namee")
+        val url = URL("https://eshop-w10.tail90e65e.ts.net/search/name/$namee")
 
         with(url.openConnection() as HttpURLConnection) {
             requestMethod = "GET"
