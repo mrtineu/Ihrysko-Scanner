@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import kotlin.math.round
 
 class MainActivity : Activity(), CoroutineScope {
 
@@ -82,15 +83,18 @@ class MainActivity : Activity(), CoroutineScope {
             recyclerViewSuggestions.visibility = View.GONE
             Log.d("INFO",product.toString())
             val pricen: String? = product.price
-            val priced: Double = pricen?.toDouble()?:0.0
+            var priced: Double=0.0
+            if(pricen!="None"){
+                priced= pricen?.toDouble()?:0.0
+                priced = (round(priced*1.2*100)/100)
+            }
+
             idTextView.text = "ID: ${product.item_id}"
-
-
-            nameTextView.text = "Name: ${product.name}"
-            priceTextView.text = "Price: ${(priced*1.2)}"
-            locView.text = "Sklady: ${product.loc}"
-            locshopView.text = "Shop: ${product.loc_shop}"
-            stockView.text = "Stock: ${product.stock}"
+            nameTextView.text = "Názov: ${product.name}"
+            priceTextView.text = "Cena: ${(priced*1.2)}€(20% DPH)"
+            locView.text = "Lokácia: ${product.loc}"
+            locshopView.text = "Predajňa: ${product.loc_shop}"
+            stockView.text = "Na skalde: ${product.stock}"
 
             // Optionally, load the image if needed
             launch {
@@ -230,13 +234,16 @@ class MainActivity : Activity(), CoroutineScope {
                     if (list.isNotEmpty()) {
                         withContext(Dispatchers.Main) {
                             val detail = list.first()
-                            nameTextView.text = "Name: ${detail.name}"
-                            priceTextView.text = "Price: ${detail.price}"
+                            val pricen: String? = detail.price
+                            var priced: Double = pricen?.toDouble()?:0.0
+                            priced = (round(priced*1.2*100)/100)
+                            nameTextView.text = "Názov: ${detail.name}"
+                            priceTextView.text = "Cena: ${(priced)}€(20% DPH)"
                             idTextView.text = "ID: ${detail.item_id}"
                             eanView.text = "EAN: ${barcode.rawValue.toString()}"
-                            locView.text = "Sklady: ${detail.loc}"
-                            locshopView.text = "Shop: ${detail.loc_shop}"
-                            stockView.text = "Stock: ${detail.stock}"
+                            locView.text = "Lokácia: ${detail.loc}"
+                            locshopView.text = "Predajňa ${detail.loc_shop}"
+                            stockView.text = "Na sklade: ${detail.stock}"
 
                             launch {
                                 try {
