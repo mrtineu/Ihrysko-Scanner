@@ -88,13 +88,14 @@ class MainActivity : Activity(), CoroutineScope {
                 priced= pricen?.toDouble()?:0.0
                 priced = (round(priced*1.2*100)/100)
             }
-
+            eanView.text="Ean: "
             idTextView.text = "ID: ${product.item_id}"
             nameTextView.text = "Názov: ${product.name}"
-            priceTextView.text = "Cena: ${(priced*1.2)}€(20% DPH)"
+            priceTextView.text = "Cena: ${priced}€(20% DPH)"
             locView.text = "Lokácia: ${product.loc}"
             locshopView.text = "Predajňa: ${product.loc_shop}"
             stockView.text = "Na skalde: ${product.stock}"
+
 
             // Optionally, load the image if needed
             launch {
@@ -235,8 +236,11 @@ class MainActivity : Activity(), CoroutineScope {
                         withContext(Dispatchers.Main) {
                             val detail = list.first()
                             val pricen: String? = detail.price
-                            var priced: Double = pricen?.toDouble()?:0.0
-                            priced = (round(priced*1.2*100)/100)
+                            var priced: Double=0.0
+                            if(pricen!="None"){
+                                priced= pricen?.toDouble()?:0.0
+                                priced = (round(priced*1.2*100)/100)
+                            }
                             nameTextView.text = "Názov: ${detail.name}"
                             priceTextView.text = "Cena: ${(priced)}€(20% DPH)"
                             idTextView.text = "ID: ${detail.item_id}"
