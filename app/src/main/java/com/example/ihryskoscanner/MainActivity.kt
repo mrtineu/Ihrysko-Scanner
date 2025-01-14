@@ -86,12 +86,12 @@ class MainActivity : Activity(), CoroutineScope {
             var priced: Double=0.0
             if(pricen!="None"){
                 priced= pricen?.toDouble()?:0.0
-                priced = (round(priced*1.2*100)/100)
+                priced = (round(priced*1.23*100)/100)
             }
             eanView.text="Ean: "
             idTextView.text = "ID: ${product.item_id}"
             nameTextView.text = "Názov: ${product.name}"
-            priceTextView.text = "Cena: ${priced}€(20% DPH)"
+            priceTextView.text = "Cena: ${priced}€(23% DPH)"
             locView.text = "Lokácia: ${product.loc}"
             locshopView.text = "Predajňa: ${product.loc_shop}"
             stockView.text = "Na skalde: ${product.stock}"
@@ -239,10 +239,10 @@ class MainActivity : Activity(), CoroutineScope {
                             var priced: Double=0.0
                             if(pricen!="None"){
                                 priced= pricen?.toDouble()?:0.0
-                                priced = (round(priced*1.2*100)/100)
+                                priced = (round(priced*1.23*100)/100)
                             }
                             nameTextView.text = "Názov: ${detail.name}"
-                            priceTextView.text = "Cena: ${(priced)}€(20% DPH)"
+                            priceTextView.text = "Cena: ${(priced)}€(23% DPH)"
                             idTextView.text = "ID: ${detail.item_id}"
                             eanView.text = "EAN: ${barcode.rawValue.toString()}"
                             locView.text = "Lokácia: ${detail.loc}"
