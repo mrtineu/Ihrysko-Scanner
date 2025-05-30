@@ -3,61 +3,94 @@ package mrtineu.ihrysko.scanner
 import android.content.Context
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body // Added explicit import
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
-import io.ktor.client.request.parameter
+import io.ktor.client.request.header
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.flow.firstOrNull // Import for firstOrNull
-import kotlinx.coroutines.flow.map // Import for map operator
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+// Ensure Product is imported if not in the same file, e.g.
+// import mrtineu.ihrysko.scanner.Product
 
+// Ktor HttpClient instance
 private val client = HttpClient(CIO) {
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
             isLenient = true
-            ignoreUnknownKeys = true // Important if API sends more fields than in your data class
+            ignoreUnknownKeys = true
         })
     }
 }
+
+// Json decoder instance
+private val jsonDecoder = Json {
+    prettyPrint = true
+    isLenient = true
+    ignoreUnknownKeys = true
+}
+
 private val API_KEY_PREFERENCE = stringPreferencesKey("api_key")
+
 suspend fun getApiKey(context: Context): String {
     val apiKey: String? = context.dataStore.data
         .map { preferences ->
-            preferences[API_KEY_PREFERENCE] // It will be null if not found
+            preferences[API_KEY_PREFERENCE]
         }
-        .firstOrNull() // Get the first emitted value or null if the flow is empty
-    return apiKey ?: "" // Simplified return, handles null by returning empty string
+        .firstOrNull()
+    return apiKey ?: ""
 }
-suspend fun getByEAN(context: Context, ean: String): Product? {
+
+// Change return type to List<Product>
+suspend fun getByEAN(context: Context, ean: String): List<Product> {
     val apiKey: String = getApiKey(context)
 
-    if (apiKey.isBlank()) { // Check if API key is blank (empty or whitespace)
+    if (apiKey.isBlank()) {
         println("API key is missing or blank. Cannot fetch product for EAN $ean.")
-        return null // Return null if API key is not valid
+        return emptyList() // Return empty list if API key is missing
     }
 
+    val requestUrl = "${AppConfig.API_BASE_URL}search/barcode/$ean"
+    println("Requesting URL: $requestUrl with API Key: $apiKey")
+
+
     return try {
-        val response: HttpResponse = client.get(AppConfig.API_BASE_URL+"/search/$ean") {
-            parameter("auth", apiKey)
+        val response: HttpResponse = client.get(requestUrl) {
+            header("auth", apiKey)
         }
 
         if (response.status.isSuccess()) {
-            val products = response.body<List<Product>>() // Ktor deserializes JSON array to List<Product>
-            products.firstOrNull() // Return the first product if the list is not empty, otherwise null
-        } else {
-            println("API Error: ${response.status} - ${response.bodyAsText()}")
-            null
-        }
-    } catch (e: Exception) {
-        println("Network request failed for EAN $ean: ${e.localizedMessage}")
-        e.printStackTrace() // Good for debugging
-        null
+            val responseBodyText = response.bodyAsText()
 
+            if (responseBodyText.isBlank()) {
+                println("API returned an empty successful response for EAN $ean.")
+                return emptyList()
+            }
+            println("Raw JSON response for EAN $ean: $responseBodyText")
+
+            val products = jsonDecoder.decodeFromString<List<Product>>(responseBodyText)
+            // Log received products
+            println("Received products for EAN $ean:")
+            products.forEachIndexed { index, product ->
+                println("   Product ${index + 1}: $product")
+            }
+            products // Return the full list of products
+        } else {
+            println("API Error for EAN $ean: ${response.status} - ${response.bodyAsText()}")
+            emptyList() // Return empty list on API error
+        }
+    } catch (e: kotlinx.serialization.SerializationException) {
+        println("JSON Deserialization failed for EAN $ean: ${e.localizedMessage}")
+        e.printStackTrace()
+        emptyList() // Return empty list on deserialization error
+    } catch (e: Exception) {
+        println("Network request or other error for EAN $ean: ${e.localizedMessage}")
+        e.printStackTrace()
+        emptyList() // Return empty list on other errors
     }
 }
